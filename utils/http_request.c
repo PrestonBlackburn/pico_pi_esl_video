@@ -10,8 +10,7 @@
 #define HTTP_RESPONSE_MAX 4096 // max response buffer
 
 static volatile bool request_complete = false;
-static volatile bool request_success = false;
-
+static char shopper_category[64] = {0};
 
 // Test DNS lookup directly
 void test_dns_lookup() {
@@ -71,7 +70,6 @@ void result_fn(
 	printf("err: %d\n", err);
 	request_complete = true;
 	// we'll actually check the recv data for specific text since we control the endpoint
-	// request_success = (httpc_result == HTTPC_RESULT_OK);
 	printf("<<< result_fn <<<\n");
 }
 
@@ -103,6 +101,35 @@ bool is_in(char *source, int len_source, char *target) {
     return is_matched;
 }
 
+bool parse_json_string_value(const char *json, int json_len, const char *key,
+                              char *out_value, int out_max) {
+    // Build the search pattern:  "key":"
+    char pattern[64];
+    snprintf(pattern, sizeof(pattern), "\"%s\":\"", key);
+    int pattern_len = strlen(pattern);
+ 
+    for (int i = 0; i <= json_len - pattern_len; i++) {
+        if (strncmp(json + i, pattern, pattern_len) == 0) {
+            // Advance past the pattern to the start of the value
+            int val_start = i + pattern_len;
+            int val_len = 0;
+ 
+            // Scan forward until the closing quote or end of buffer
+            while (val_start + val_len < json_len &&
+                   json[val_start + val_len] != '"') {
+                val_len++;
+            }
+ 
+            // Clamp to output buffer size
+            if (val_len >= out_max) val_len = out_max - 1;
+            strncpy(out_value, json + val_start, val_len);
+            out_value[val_len] = '\0';
+            return true;
+        }
+    }
+    return false;
+}
+
 // when body data is received
 err_t recv_fn(
 	void *arg,
@@ -123,15 +150,14 @@ err_t recv_fn(
 	int print_len = p->len <200 ? p->len : 200;
 	printf("Data: %.*s\n", print_len, data);
 
-	// check endpoint for specific response text
-	char alive_str[] = "alive";
-	if (is_in(data, p->len, alive_str)) {
-		printf("Set request to success!\n");
-		request_success = true;
-	} else {
-		printf("Set request to failed!\n");
-		request_success = false;
-	}
+	// check endpoint for shopper_category
+	if (parse_json_string_value(data, p->len, "shopper_category",
+								shopper_category, sizeof(shopper_category))) {
+			printf("shopper_category: %s\n", shopper_category);
+		} else {
+			printf("shopper_category key not found in response\n");
+			shopper_category[0] = '\0';
+		}
 
 	pbuf_free(p);
 
@@ -139,7 +165,7 @@ err_t recv_fn(
 	return ERR_OK;
 }
 
-bool test_server_http_request() {
+char *get_current_shopper() {
     printf("\n=== Starting HTTP Request ===\n");
 
 	httpc_connection_t settings = {
@@ -152,36 +178,22 @@ bool test_server_http_request() {
     err_t err = httpc_get_file_dns(
 		"prestonblackburn.com",
 		80,
-		"/healthz",
+		"/face/current-shopper",
 		&settings,
 		recv_fn,
 		NULL,
 		&connection
 	);
 
-    // Convert IP string to ip_addr_t
-    // ip_addr_t server_ip;
-    // IP4_ADDR(&server_ip, 142, 250, 185, 46);  // google.com
-    // err_t err = httpc_get_file(
-    //     &server_ip,  // google's ip address
-    //     80,
-    //     "/",
-    //     &settings,
-    //     recv_fn,
-    //     NULL,
-    //     &connection
-    // );
-
-    if (err != ERR_OK) {
+	if (err != ERR_OK) {
 		printf("HTTP request failed to start %d\n", err);
-		return 1;
+		return NULL;  // caller should check for NULL
 	}
 
    	printf("waiting for request\n");
 	sleep_ms(10000);
 	printf("HTTP Request Done\n");
 
-	// should return true/false based on response status
-	return request_success;
+	return shopper_category;
 	// return 0;
 }
