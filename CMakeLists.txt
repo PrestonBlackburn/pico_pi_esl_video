@@ -19,7 +19,6 @@ add_subdirectory(lib/Config)
 add_subdirectory(lib/e-Paper)
 add_subdirectory(lib/Fonts)
 add_subdirectory(lib/GUI)
-add_subdirectory(lib/pico-ups)
 add_subdirectory(utils)
 
 # add a header directory
@@ -27,7 +26,7 @@ include_directories(./utils)
 include_directories(./lib/Config)
 include_directories(./lib/GUI)
 include_directories(./lib/utils)
-include_directories(./lib/pico-ups)
+
 
 # generate an executable file
 add_executable(eink_monitor 
