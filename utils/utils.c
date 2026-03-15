@@ -13,7 +13,7 @@ int eink_init(void) {
     }
     // init eink screen
     EPD_2in13_V4_Init_Fast();
-    EPD_2in13_V4_Clear(); // white clear
+    EPD_2in13_V4_Clear();
     sleep_ms(500);
     // test flashing screen
     Debug("Paint_NewImage\r\n");
@@ -43,7 +43,16 @@ int set_eink_shelf_label(void) {
     EPD_2in13_V4_Clear(); // white clear
     sleep_ms(500);
 
-    draw_generic_esl_image_y();
+
+    Paint_NewImage(BlackImage, EPD_2in13_V4_WIDTH, EPD_2in13_V4_HEIGHT, ROTATE_90, WHITE);
+    Paint_SelectImage(BlackImage);
+    Paint_Clear(WHITE);
+    draw_generic_esl_image_y_black();
+    // draw_generic_esl_image_y();
+    // draw_generic_esl_image();
+
+    // Push the buffer to the physical display
+    EPD_2in13_V4_Display(BlackImage);
 
     free(BlackImage);
     BlackImage = NULL;

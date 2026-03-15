@@ -10,6 +10,7 @@ void draw_online_status(UBYTE *image);
 void draw_offline_status(UBYTE *image);
 void draw_generic_esl_image_y(void);
 void draw_generic_esl_image(void);
+void draw_generic_esl_image_y_black(void);
 
 #endif
 

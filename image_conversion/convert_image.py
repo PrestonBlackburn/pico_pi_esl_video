@@ -38,7 +38,7 @@ def generate_c_array(
     return c_code
 
 if __name__ == "__main__":
-    img = Image.open("generic_eink_example_y.png")
+    img = Image.open("generic_eink_example_y_black.png")
     b, size = image_to_bytes(img)
     print(size)
     print(size[0])
@@ -47,7 +47,7 @@ if __name__ == "__main__":
 
     processed = Image.frombytes('1', size, b)
     processed.convert('1')
-    processed.save("generic_eink_example_y.pbm", format="PPM")
+    processed.save("generic_eink_example_y_black.pbm", format="PPM")
 
     formatted = generate_c_array(b, size)
     print(formatted)

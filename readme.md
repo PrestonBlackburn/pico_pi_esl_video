@@ -74,7 +74,7 @@ Example setup: https://ghubcoder.github.io/posts/waking-the-pico-external-trigge
 
 The Waveshare repo isn't really maintained, so I'll be using this repo as the source code for my 2.13 inch eink display. Code to support other displays has been removed for simplicity. 
 
-*To Enable Debug Mode, update `EPD_Test.h`*
+*To Enable Debug Mode, update `utils.h`*
 ```h
 ++ #define DEBUG 1 // for logging
 ```

@@ -49,7 +49,6 @@ target_link_libraries(eink_monitor
     GUI 
     Fonts 
     Config 
-    UPS
     pico_stdlib 
     hardware_spi
 
