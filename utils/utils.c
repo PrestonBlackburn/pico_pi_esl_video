@@ -61,6 +61,71 @@ int set_eink_shelf_label(void) {
     return 0;
 }
 
+int set_personalized_esl_image_y_black(void) {
+        //Create a new image cache
+    UBYTE *BlackImage;
+    UWORD Imagesize = ((EPD_2in13_V4_WIDTH % 8 == 0)? (EPD_2in13_V4_WIDTH / 8 ): (EPD_2in13_V4_WIDTH / 8 + 1)) * EPD_2in13_V4_HEIGHT;
+
+    if((BlackImage = (UBYTE *)malloc(Imagesize)) == NULL) {
+        Debug("Failed to apply for black memory...\r\n");
+        return -1;
+    }
+    // init eink screen
+    EPD_2in13_V4_Init_Fast();
+    EPD_2in13_V4_Clear(); // white clear
+    sleep_ms(500);
+
+
+    Paint_NewImage(BlackImage, EPD_2in13_V4_WIDTH, EPD_2in13_V4_HEIGHT, ROTATE_90, WHITE);
+    Paint_SelectImage(BlackImage);
+    Paint_Clear(WHITE);
+    draw_personalized_esl_image_y_black();
+    // draw_generic_esl_image_y();
+    // draw_generic_esl_image();
+
+    // Push the buffer to the physical display
+    EPD_2in13_V4_Display(BlackImage);
+
+    free(BlackImage);
+    BlackImage = NULL;
+    DEV_Delay_ms(2000);//important, at least 2s
+
+    return 0;
+}
+
+int set_generic_esl_image_y_black(void) {
+        //Create a new image cache
+    UBYTE *BlackImage;
+    UWORD Imagesize = ((EPD_2in13_V4_WIDTH % 8 == 0)? (EPD_2in13_V4_WIDTH / 8 ): (EPD_2in13_V4_WIDTH / 8 + 1)) * EPD_2in13_V4_HEIGHT;
+
+    if((BlackImage = (UBYTE *)malloc(Imagesize)) == NULL) {
+        Debug("Failed to apply for black memory...\r\n");
+        return -1;
+    }
+    // init eink screen
+    EPD_2in13_V4_Init_Fast();
+    EPD_2in13_V4_Clear(); // white clear
+    sleep_ms(500);
+
+
+    Paint_NewImage(BlackImage, EPD_2in13_V4_WIDTH, EPD_2in13_V4_HEIGHT, ROTATE_90, WHITE);
+    Paint_SelectImage(BlackImage);
+    Paint_Clear(WHITE);
+    draw_base_esl_image_y_black();
+    // draw_generic_esl_image_y();
+    // draw_generic_esl_image();
+
+    // Push the buffer to the physical display
+    EPD_2in13_V4_Display(BlackImage);
+
+    free(BlackImage);
+    BlackImage = NULL;
+    DEV_Delay_ms(2000);//important, at least 2s
+
+    return 0;
+}
+
+
 //int set_eink_status(int status, datetime_t *t) {
 int set_eink_status(ServerStatus *server_status, datetime_t *current_time, float battery_pct) {
 

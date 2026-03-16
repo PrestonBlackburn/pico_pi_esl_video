@@ -20,7 +20,7 @@ int main(void) {
     #if 1
         stdio_init_all();
         DEV_Delay_ms(5000);
-        printf("Starting ESL");
+        printf("Starting ESL\n");
 
         if (DEV_Module_Init() != 0) {
             printf("e-Paper init failed\n");
@@ -36,9 +36,30 @@ int main(void) {
     #endif
 
 
+
     // -------------- Dynamic Case For Demo -----------------
 
-    
+    // test
+    #if 1
+        printf("Test Generic ESL\n");
+        set_generic_esl_image_y_black();
+        printf("finished image display\n");
+        printf("Test Personalized ESL\n");
+        set_personalized_esl_image_y_black();
+        printf("finished image display\n");
+    #endif
+
+    int retry_count = 5;
+    int flash_wifi_led = 1;
+    printf("Starting Init Wifi\n");
+    int connect_status = init_wifi(retry_count, flash_wifi_led);
+    if (connect_status != 0) {
+        printf("WiFi init failed, stopping\n");
+        return -1;
+    }
+    DEV_Delay_ms(1000); 
+
+
     bool use_generic_label = true;
 
     while (1) {
@@ -52,17 +73,19 @@ int main(void) {
             continue;
         }
 
+
+
         if ( (strcmp(use_specific_label, "None") != 0) && (use_generic_label == true) ) {
             // update the screen
             printf("Switching to personal label\n");
             use_generic_label = false;
-            draw_personalized_esl_image_y_black();
+            set_personalized_esl_image_y_black();
 
         } else if ( (strcmp(use_specific_label, "None") == 0) && (use_generic_label == false)) {
             // switch back to the generic case
             printf("Switching to generic label\n");
             use_generic_label = true;
-            draw_base_esl_image_y_black();
+            set_generic_esl_image_y_black();
         } else {
             // no changes in other two cases
             printf("no changes\n");
